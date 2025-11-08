@@ -1,0 +1,141 @@
+<!--
+===============================================================================
+ Sysmon for Linux Configuration 
+ Author: Taz Wake
+ Target Distributions: RHEL (7+), Ubuntu (18.04+), and derivatives
+ Date: 8 November 2025
+
+ Rationale:
+ This configuration is built to generate telemetry that directly supports the
+ incident response process. It is heavily informed by real-world attacks that 
+ leverage temporary and memory-based filesystems for evasion.
+
+ This document is designed to support SANS FOR577. https://sans.org/for577
+
+ Key Threats Addressed:
+ - Execution of malicious binaries from /dev/shm
+ - Use of /tmp and /var/tmp for staging and payload execution
+ - Fileless and in-memory execution techniques (T1055, T1204)
+ - Persistence mechanisms and suspicious process ancestry
+
+ Design Philosophy:
+ - Enable critical Event IDs for process, file, and network activity.
+ - Create explicit rules to generate high-fidelity, low-noise alerts on
+   known-bad behaviours, especially execution from volatile directories.
+ - Minimise "noisy" exclusions to preserve forensic context, but exclude
+   known benign system and package manager activity to improve signal-to-noise.
+
+### NOTE ###
+This is not a catch all config. There are a lot of events it will miss.
+
+===============================================================================
+-->
+
+<Sysmon schemaversion="4.82">
+    <!--
+    Global options for the configuration.
+    -->
+    <HashAlgorithms>sha256</HashAlgorithms> <!-- Essential for file integrity and IOC hunting -->
+    <CheckRevocation/>
+    <DnsLookup/>
+
+    <!--
+    EVENT ID 1: Process Creation
+    The cornerstone of process monitoring. Captures command line, parent process,
+    hashes, and user context. Critical for hunting.
+    -->
+    <EventFiltering>
+        <ProcessCreate onmatch="include">
+            <!--
+            === HIGH-PRIORITY INCLUSIONS ===
+            Generate specific, high-fidelity events for execution from risky locations.
+            These are direct responses to observed TTPs.
+            -->
+            <Rule groupRelation="and">
+                <Image condition="contains">/dev/shm/</Image>
+                <!-- Tactic: Defense Evasion, Technique: T1055 (Process Injection) / T1204 (User Execution).
+                     Malware like BPFDoor and XorDdos are known to use /dev/shm. -->
+            </Rule>
+            <Rule groupRelation="and">
+                <Image condition="contains">/tmp/</Image>
+                <Image condition="end with">.elf</Image>
+            </Rule>
+            <Rule groupRelation="and">
+                <Image condition="contains">/var/tmp/</Image>
+            </Rule>
+            <!--
+            === FORENSIC CONTEXT (Low-Noise) ===
+            Capture interpreters spawning from non-standard paths. Attackers often
+            use scripts or loaders from /tmp or /dev/shm.
+            -->
+            <Rule groupRelation="and">
+                <ParentImage condition="contains">/tmp/</ParentImage>
+                <Image condition="contains any">python;perl;ruby;bash;sh</Image>
+            </Rule>
+            <Rule groupRelation="and">
+                <ParentImage condition="contains">/dev/shm/</ParentImage>
+                <Image condition="contains any">python;perl;ruby;bash;sh</Image>
+            </Rule>
+        </ProcessCreate>
+
+        <!--
+        EVENT ID 2: File Creation Time Modification
+        Detects timestomping, a common post-compromise anti-forensics technique.
+        -->
+        <FileCreateTime onmatch="exclude">
+            <!-- Reduce noise from benign applications that frequently update timestamps. -->
+            <Image condition="contains any">/usr/bin/gnome-shell;/usr/libexec/gvfsd;</Image>
+        </FileCreateTime>
+
+        <!--
+        EVENT ID 11: File Create
+        Monitor for the creation of files in key directories that are common attack staging grounds.
+        Also monitor for potential tampering to SSH components - !can be noisy!
+        -->
+        <FileCreate onmatch="include">
+            <Rule groupRelation="or">
+                <TargetFilename condition="begin with">/dev/shm/</TargetFilename>
+                <TargetFilename condition="begin with">/tmp/</TargetFilename>
+                <TargetFilename condition="begin with">/var/tmp/</TargetFilename>
+                <!-- Also monitor for hidden files in user home directories -->
+                <TargetFilename condition="contains">/.cache/</TargetFilename>
+                <TargetFilename condition="contains">/.local/share/</TargetFilename>
+               <!-- Also SSH changes -->
+                <TargetFilename condition="contains">/.ssh/authorized_keys</TargetFilename>
+                <TargetFilename condition="contains">/.ssh/config</TargetFilename>
+            </Rule>
+        </FileCreate>
+
+        <!--
+        EVENT ID 3: Network Connection
+        Essential for understanding C2 and lateral movement.
+        -->
+        <NetworkConnect onmatch="exclude">
+            <!-- Exclude local loopback and common internal chatter to reduce volume -->
+            <DestinationPort condition="is">53</DestinationPort> <!-- DNS -->
+            <DestinationIp condition="is">127.0.0.1</DestinationIp>
+            <DestinationIp condition="begin with">169.254.</DestinationIp> <!-- Link-local -->
+            <Image condition="end with">/systemd</Image>
+            <!-- Package managers are very chatty; exclude their routine traffic -->
+            <Image condition="end with">/apt-get</Image>
+            <Image condition="end with">/dnf</Image>
+            <Image condition="end with">/yum</Image>
+        </NetworkConnect>
+
+        <!--
+        EVENT ID 8: CreateRemoteThread (Linux equivalent: Process Injection)
+        This is a very strong indicator of malicious activity on Linux.
+        -->
+        <ProcessInjection onmatch="include">
+            <!-- No exclusions; any injection attempt is highly suspicious. -->
+        </ProcessInjection>
+
+        <!--
+        EVENT ID 255: Sysmon Error
+        Always log configuration or operational errors for health monitoring.
+        -->
+        <Error onmatch="include">
+        </Error>
+
+    </EventFiltering>
+</Sysmon>
