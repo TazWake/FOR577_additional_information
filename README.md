@@ -1,4 +1,5 @@
-# FOR577_additional_information
+# FOR577 Additional Information
+
 This repo will be used to hold documents which provide additional detail or guidance for students on SANS FOR577.
 
 ## Contents
@@ -9,4 +10,4 @@ This repo will be used to hold documents which provide additional detail or guid
 
 ## Note
 
-All the content here is untested and provided without warranty or support. There are no guarantees anything here will work or be correct.
+All the content here is untested and provided without warranty or support. There are no guarantees that anything here will work or be correct.
