@@ -213,6 +213,151 @@ psort.py -o l2tcsv -w timeline.csv timeline.plaso
 
 ---
 
+### [tools/self-check/](tools/self-check/)
+
+**Minimal IR Trust-Check Binary**
+
+A statically-linked assembly binary designed as a trust beacon for incident response engagements on potentially compromised Linux systems.
+
+#### Purpose
+Provide a minimal, dependency-free utility that reports process execution context without relying on libc or external libraries that may be backdoored by rootkits.
+
+#### Design Philosophy
+- **No external dependencies**: Uses raw syscalls only, completely statically linked
+- **Minimal attack surface**: ~8.7KB binary written in x86-64 assembly
+- **Trust verification**: Reports execution context that's harder for userland rootkits to falsify
+- **IR-optimized**: Designed for deployment to potentially hostile systems
+
+#### What It Reports
+The tool outputs a single line of key=value pairs showing:
+- **Process identity**: PID, PPID, UID, EUID, GID, EGID
+- **Capability sets**: Effective and permitted capabilities (hexadecimal)
+- **Sandbox status**: Seccomp mode (0=disabled, 1=strict, 2=filter)
+- **Privilege restrictions**: NoNewPrivs flag (0=disabled, 1=enabled)
+
+**Example output:**
+```
+pid=12345 ppid=12344 uid=1000 euid=1000 gid=1000 egid=1000 cap_eff=0x0 cap_prm=0x0 seccomp=0 nonewprivs=0
+```
+
+#### Key Use Cases
+- **Container escape detection**: Compare capabilities inside/outside containers
+- **Privilege escalation analysis**: Identify unexpected EUID changes or capabilities
+- **Sandbox verification**: Check if seccomp/NoNewPrivs are active
+- **Initial triage baseline**: Quick environment check before deploying complex forensic tools
+- **Rootkit evasion**: Small binary with raw syscalls may bypass LD_PRELOAD hooks
+
+#### Technical Details
+- **Architecture**: x86-64 Linux
+- **Binary size**: <16KB (~8.7KB stripped)
+- **Linking**: Statically linked, no dynamic dependencies
+- **Language**: NASM assembly
+- **Syscalls used**: getpid, getppid, getuid, geteuid, getgid, getegid, open, read, write, exit
+
+#### How to Build
+
+```bash
+# Navigate to tool directory
+cd tools/self-check/
+
+# Build using automated script (recommended)
+./build.sh
+
+# Or build manually
+nasm -felf64 src/self-check.asm -o self-check.o
+ld -static -nostdlib -o self-check self-check.o
+strip self-check
+
+# Verify static linking
+ldd self-check
+# Expected output: "not a dynamic executable"
+
+# Test execution
+./self-check
+```
+
+**Prerequisites:**
+- NASM assembler (2.14+)
+- GNU ld linker
+- x86-64 Linux system
+
+#### Deployment to Target Systems
+
+**Option 1: Direct copy**
+```bash
+scp self-check incident-responder@target:/tmp/
+ssh incident-responder@target
+chmod +x /tmp/self-check
+/tmp/self-check
+```
+
+**Option 2: Base64 encoding** (for copy-paste deployment)
+```bash
+# On IR workstation
+base64 self-check > self-check.b64
+
+# On target (paste base64 content, then):
+base64 -d > /tmp/self-check
+chmod +x /tmp/self-check
+/tmp/self-check
+```
+
+**Option 3: Integrity verification**
+```bash
+# Generate checksum before transfer
+sha256sum self-check > self-check.sha256
+
+# Verify on target after transfer
+sha256sum -c self-check.sha256
+```
+
+#### Interpreting Output
+
+**Capability values** (hexadecimal bitmask):
+- `0x0` - No capabilities (normal unprivileged process)
+- `0x3fffffffff` - All capabilities (root-equivalent on Linux 5.x)
+- `0xa80425fb` - Docker default capability set
+- Other values - Partial capability sets (use `capsh --decode` to interpret)
+
+**Seccomp modes:**
+- `0` - Disabled (no syscall filtering)
+- `1` - Strict mode (only read, write, exit, sigreturn allowed)
+- `2` - Filter mode (custom BPF filter, common in containers)
+
+**Red flags to investigate:**
+- Non-root user with `cap_eff != 0x0` (unexpected capabilities)
+- `uid != euid` when not running SUID binary (possible privilege escalation)
+- Root process with `seccomp != 0` outside containers (unusual)
+- Container with `cap_eff=0x3fffffffff` (full capabilities in container)
+
+#### Known Limitations
+
+**What self-check does NOT detect:**
+- Namespace isolation (use `/proc/self/ns/*` or `lsns`)
+- Cgroups configuration (use `/proc/self/cgroup`)
+- SELinux/AppArmor context (use `id -Z` or `/proc/self/attr/current`)
+- Resource limits (use `prlimit`)
+- File capabilities on the binary itself (use `getcap`)
+- Capability bounding set or ambient set
+
+**Security considerations:**
+- Kernel-level rootkits can still intercept syscalls
+- `/proc` filesystem itself can be manipulated
+- Results should be cross-validated with other techniques
+- Not a silver bullet, but raises the bar for rootkit authors
+
+#### Full Documentation
+
+See the [detailed README](tools/self-check/README.md) for:
+- Complete deployment techniques
+- IR workflow integration examples
+- Detailed use case scenarios
+- Capability interpretation guide
+- Troubleshooting procedures
+- Forensic workflow examples
+
+---
+
 ## Testing Recommendations
 
 ### Lab Environment Setup
