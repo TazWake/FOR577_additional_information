@@ -43,6 +43,13 @@ The **[alphas/](alphas/)** directory contains **untested and experimental** conf
   - Targets authentication logs, systemd journals, shell history, SSH config
   - Excludes high-volume, low-signal directories
 
+- **[tools/self-check/](alphas/tools/self-check/)** - Minimal IR trust-check binary
+  - Statically-linked x86-64 assembly binary (<16KB)
+  - Reports process identity (PID, PPID, UID/EUID, GID/EGID)
+  - Shows capability sets and sandbox status (seccomp, NoNewPrivs)
+  - No external dependencies (uses raw syscalls only)
+  - Ideal for verifying execution context on potentially compromised systems
+
 ## Using This Repository
 
 ### For SANS FOR577 Students
@@ -58,11 +65,43 @@ Use these resources to:
 - Create or refine detection and monitoring configurations
 - Reference during incident response engagements
 
+### Building the self-check Tool
+
+The self-check utility is a minimal trust beacon for incident response:
+
+```bash
+# Navigate to the tool directory
+cd alphas/tools/self-check/
+
+# Build using the provided script
+./build.sh
+
+# Or build manually
+nasm -felf64 src/self-check.asm -o self-check.o
+ld -static -nostdlib -o self-check self-check.o
+strip self-check
+
+# Verify it's statically linked
+ldd self-check  # Should output: "not a dynamic executable"
+
+# Test execution
+./self-check
+```
+
+**Use cases:**
+- Verify execution context before deploying forensic tools
+- Detect container escapes by comparing capabilities inside/outside containers
+- Identify privilege restrictions (seccomp, NoNewPrivs)
+- Baseline environment during initial triage on unknown systems
+
+See the [detailed README](alphas/tools/self-check/README.md) for deployment techniques, use cases, and interpretation guidance.
+
 ### Getting Started
 
 1. **Start with the /proc handbook** ([Overview_of_Proc.md](Overview_of_Proc.md)) for essential Linux forensic knowledge
 2. **Review eBPF threats** ([eBPF_RootKits_Summary.md](eBPF_RootKits_Summary.md)) to understand advanced adversary techniques
-3. **Customize alpha configs** as needed for your environment (test thoroughly first)
+3. **Build the self-check tool** ([alphas/tools/self-check/](alphas/tools/self-check/)) for IR deployments
+4. **Customize alpha configs** as needed for your environment (test thoroughly first)
 
 ## Important Notes
 
