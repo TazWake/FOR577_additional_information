@@ -22,12 +22,19 @@ Comprehensive forensic reference materials for the Linux pseudo-filesystem:
   - `proc_sys_contents.md` - Kernel tunable security implications
   - `README.md` - Guide to the /proc documentation structure
 
-#### EXT4 Filesystem Forensics
+#### Filesystem Forensics
 - **[Manual_EXT4_Extraction_CheatSheet.md](Manual_EXT4_Extraction_CheatSheet.md)** - Step-by-step manual file extraction from EXT4 filesystems:
   - Direct inode-to-data mapping without forensic tools
   - Superblock, group descriptor, and extent parsing
   - Manual data recovery using dd and hex editors
   - Useful when automated tools fail or for understanding EXT4 internals
+
+- **[Manual_XFS_File_Extraction_CheatSheet.md](Manual_XFS_File_Extraction_CheatSheet.md)** - Manual file extraction from XFS filesystems:
+  - XFS allocation group (AG) structure and navigation
+  - Inode B+tree traversal and chunk location
+  - Extent-based, B-tree, and local-format file extraction
+  - XFS v5 forensic considerations and recovery limitations
+  - Critical for systems using XFS (RHEL/CentOS default)
 
 #### eBPF Rootkits and Advanced Threats
 - **[eBPF_RootKits_Summary.md](eBPF_RootKits_Summary.md)** - Technical overview of eBPF-based rootkits including:
@@ -108,7 +115,9 @@ See the [detailed README](alphas/tools/self-check/README.md) for deployment tech
 
 1. **Start with the /proc handbook** ([Overview_of_Proc.md](Overview_of_Proc.md)) for essential Linux forensic knowledge
 2. **Review eBPF threats** ([eBPF_RootKits_Summary.md](eBPF_RootKits_Summary.md)) to understand advanced adversary techniques
-3. **Learn manual EXT4 recovery** ([Manual_EXT4_Extraction_CheatSheet.md](Manual_EXT4_Extraction_CheatSheet.md)) for low-level filesystem forensics
+3. **Learn manual filesystem recovery** for low-level forensics:
+   - [Manual_EXT4_Extraction_CheatSheet.md](Manual_EXT4_Extraction_CheatSheet.md) - EXT4 filesystems (Ubuntu/Debian default)
+   - [Manual_XFS_File_Extraction_CheatSheet.md](Manual_XFS_File_Extraction_CheatSheet.md) - XFS filesystems (RHEL/CentOS default)
 4. **Build the self-check tool** ([alphas/tools/self-check/](alphas/tools/self-check/)) for IR deployments
 5. **Customize alpha configs** as needed for your environment (test thoroughly first)
 
