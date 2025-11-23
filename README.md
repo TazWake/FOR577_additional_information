@@ -43,6 +43,14 @@ Comprehensive forensic reference materials for the Linux pseudo-filesystem:
   - ebpfkit (open-source proof-of-concept)
   - Detection challenges and EDR evasion techniques
 
+- **[binfmt_misc-abuse-review.md](binfmt_misc-abuse-review.md)** - In-depth analysis of kernel execution hijacking via binfmt_misc (Shadow SUID technique):
+  - Privilege escalation without SUID binaries via kernel hooks
+  - Binary format handler abuse and credential inheritance ('C' flag)
+  - Proxy execution and forensic evasion mechanisms
+  - Detection engineering strategies and artifact matrix
+  - Critical for understanding advanced persistence and PrivEsc techniques
+  - Based on research by Stephan Berger (@malmoeb)
+
 ### Experimental Configuration Files (Alpha)
 
 The **[alphas/](alphas/)** directory contains **untested and experimental** configurations designed as starting points for security professionals:
@@ -76,7 +84,7 @@ These materials complement your course workbook and provide:
 ### For IR Practitioners
 Use these resources to:
 - Build baseline knowledge of Linux forensic artifacts
-- Understand modern rootkit techniques (eBPF)
+- Understand modern rootkit techniques (eBPF) and kernel-level persistence mechanisms (binfmt_misc abuse)
 - Create or refine detection and monitoring configurations
 - Reference during incident response engagements
 
@@ -114,7 +122,9 @@ See the [detailed README](alphas/tools/self-check/README.md) for deployment tech
 ### Getting Started
 
 1. **Start with the /proc handbook** ([Overview_of_Proc.md](Overview_of_Proc.md)) for essential Linux forensic knowledge
-2. **Review eBPF threats** ([eBPF_RootKits_Summary.md](eBPF_RootKits_Summary.md)) to understand advanced adversary techniques
+2. **Review advanced kernel-level threats** to understand sophisticated adversary techniques:
+   - [eBPF_RootKits_Summary.md](eBPF_RootKits_Summary.md) - eBPF-based rootkits and detection challenges
+   - [binfmt_misc-abuse-review.md](binfmt_misc-abuse-review.md) - Shadow SUID technique and kernel execution hijacking
 3. **Learn manual filesystem recovery** for low-level forensics:
    - [Manual_EXT4_Extraction_CheatSheet.md](Manual_EXT4_Extraction_CheatSheet.md) - EXT4 filesystems (Ubuntu/Debian default)
    - [Manual_XFS_File_Extraction_CheatSheet.md](Manual_XFS_File_Extraction_CheatSheet.md) - XFS filesystems (RHEL/CentOS default)
