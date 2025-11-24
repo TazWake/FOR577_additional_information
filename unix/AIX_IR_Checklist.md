@@ -1,4 +1,7 @@
 # Live Forensic Triage: IBM AIX
+
+Note: **Draft**
+
 **Date:** _______________  
 **Case Number:** _______________  
 **Examiner:** _______________  
