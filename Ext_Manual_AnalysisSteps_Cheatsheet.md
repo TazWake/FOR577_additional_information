@@ -151,8 +151,8 @@ dd if=/dev/loop0p1 bs=4096 skip=<block> count=1 | xxd
 | Dump file by inode | `debugfs -R "dump <inode> file.bin"` |
 | Show journal info | `debugfs -R "logdump"` |
 | Dump inode table | `dd` (after locating table via `dumpe2fs`) |
-| Last mount time | `tune2fs -l | grep 'Last mount time'` |
-| Last write time | `tune2fs -l | grep 'Last write time'` |
+| Last mount time | `tune2fs -l \| grep 'Last mount time'` |
+| Last write time | `tune2fs -l \| grep 'Last write time'` |
 | List directory entries | `debugfs -R "ls -d /path"` |
 | Map block → inode | `debugfs -R "icheck <block>"` |
 | Show blocks for inode | `debugfs -R "blocks <inode>"` |
