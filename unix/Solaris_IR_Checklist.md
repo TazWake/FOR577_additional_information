@@ -1,4 +1,7 @@
 # Live Forensic Triage: Oracle Solaris
+
+Note: **Draft**
+
 **Date:** _______________  
 **Case Number:** _______________  
 **Examiner:** _______________  
