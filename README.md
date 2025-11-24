@@ -23,10 +23,11 @@ Comprehensive forensic reference materials for the Linux pseudo-filesystem:
   - `README.md` - Guide to the /proc documentation structure
 
 #### Filesystem Forensics
-- **[Manual_EXT4_Extraction_CheatSheet.md](Manual_EXT4_Extraction_CheatSheet.md)** - Step-by-step manual file extraction from EXT4 filesystems:
-  - Direct inode-to-data mapping without forensic tools
-  - Superblock, group descriptor, and extent parsing
-  - Manual data recovery using dd and hex editors
+- **[Manual_EXT4_FileCarving.md](Manual_EXT4_FileCarving.md)** - Manual file carving from EXT4 filesystems by inode number:
+  - Multi-partition raw image handling (GPT layouts with partition offset calculations)
+  - Block group and inode table location
+  - Extent tree parsing and physical block mapping
+  - File carving using xxd from raw images
   - Useful when automated tools fail or for understanding EXT4 internals
 
 - **[Manual_XFS_File_Extraction_CheatSheet.md](Manual_XFS_File_Extraction_CheatSheet.md)** - Manual file extraction from XFS filesystems:
@@ -126,7 +127,7 @@ See the [detailed README](alphas/tools/self-check/README.md) for deployment tech
    - [eBPF_RootKits_Summary.md](eBPF_RootKits_Summary.md) - eBPF-based rootkits and detection challenges
    - [binfmt_misc-abuse-review.md](binfmt_misc-abuse-review.md) - Shadow SUID technique and kernel execution hijacking
 3. **Learn manual filesystem recovery** for low-level forensics:
-   - [Manual_EXT4_Extraction_CheatSheet.md](Manual_EXT4_Extraction_CheatSheet.md) - EXT4 filesystems (Ubuntu/Debian default)
+   - [Manual_EXT4_FileCarving.md](Manual_EXT4_FileCarving.md) - EXT4 filesystems (Ubuntu/Debian default)
    - [Manual_XFS_File_Extraction_CheatSheet.md](Manual_XFS_File_Extraction_CheatSheet.md) - XFS filesystems (RHEL/CentOS default)
 4. **Build the self-check tool** ([alphas/tools/self-check/](alphas/tools/self-check/)) for IR deployments
 5. **Customize alpha configs** as needed for your environment (test thoroughly first)
