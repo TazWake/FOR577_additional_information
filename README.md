@@ -4,6 +4,12 @@ Supplementary educational materials and reference documentation for **SANS FOR57
 
 This repository provides students and Linux IR practitioners with additional technical detail, configuration examples, and forensic reference materials that extend beyond the core course content.
 
+## Quick Navigation
+
+**New to this repository?**
+- **[QUICK_START.md](QUICK_START.md)** - Find documents by task (process analysis, file recovery, rootkit detection, etc.)
+- **[NAVIGATION.md](NAVIGATION.md)** - Understand document relationships and hierarchy
+
 ## Contents
 
 ### Reference Documentation
@@ -11,25 +17,43 @@ This repository provides students and Linux IR practitioners with additional tec
 #### Linux /proc Filesystem Forensics
 Comprehensive forensic reference materials for the Linux pseudo-filesystem:
 
-- **[Overview_of_Proc.md](Overview_of_Proc.md)** - Complete forensic reference handbook covering:
-  - System-wide /proc entries with DFIR focus
-  - Per-process directories (/proc/[pid]/)
-  - Kernel tunables (/proc/sys/)
-  - Baseline checks and practical IR guidance
+- **[proc/PROC_REFERENCE_GUIDE.md](proc/PROC_REFERENCE_GUIDE.md)** - Complete unified /proc filesystem DFIR reference:
+  - Quick reference tables for rapid lookup during live IR
+  - Detailed system-wide files and directories analysis
+  - Detailed per-process artifacts (/proc/[pid]/) with DFIR guidance
+  - Kernel tunables (/proc/sys/) quick reference with links to detailed analysis
+  - Practical IR guidance and common attack patterns
+  - Comprehensive glossary of technical terms
 
-- **[proc/](proc/)** - Detailed breakdowns for deep-dive analysis:
-  - `individual_proc_folders.md` - Expanded per-process artifact reference
-  - `proc_sys_contents.md` - Kernel tunable security implications
-  - `README.md` - Guide to the /proc documentation structure
+- **[sys/](sys/)** - Deep-dive security analysis of kernel tunables:
+  - [kernel_security_parameters.md](sys/kernel_security_parameters.md) - `/proc/sys/kernel/` forensic reference (ASLR, module loading, core dumps, ptrace)
+  - [network_security_parameters.md](sys/network_security_parameters.md) - `/proc/sys/net/` forensic reference (IP forwarding, RP filtering, TCP hardening)
+  - [README.md](sys/README.md) - Navigation guide for kernel tunable documentation
 
-#### Filesystem Forensics
-- **[Manual_EXT4_FileCarving.md](Manual_EXT4_FileCarving.md)** - Manual file carving from EXT4 filesystems by inode number:
-  - Multi-partition raw image handling (GPT layouts with partition offset calculations)
-  - Block group and inode table location
-  - Extent tree parsing and physical block mapping
-  - File carving using xxd from raw images
-  - Useful when automated tools fail or for understanding EXT4 internals
+#### EXT4 Filesystem Forensics - Scenario-Based Guides
+Choose the guide that matches your situation:
 
+- **[EXT4_BasicFileRecovery.md](EXT4_BasicFileRecovery.md)** - Quick file recovery when you know the inode number:
+  - Filesystem identification and geometry extraction
+  - Using debugfs for inode inspection and file recovery
+  - Single-partition scenarios with mounted filesystems or loop devices
+  - **Use when:** You have an inode number and need straightforward recovery
+
+- **[EXT4_DeletedFileCarving.md](EXT4_DeletedFileCarving.md)** - Recovering deleted files:
+  - Journal analysis for deletion events and metadata recovery
+  - Directory enumeration including deleted entries
+  - Inode table searching and block-to-inode mapping
+  - Automated recovery with extundelete
+  - **Use when:** Files were deleted and you need to locate and recover them
+
+- **[EXT4_AdvancedForensics.md](EXT4_AdvancedForensics.md)** - Complex recovery scenarios:
+  - Multi-partition disk images (GPT/MBR with partition offset calculations)
+  - Manual extent tree parsing and interpretation
+  - Raw hex carving with xxd and dd
+  - Corrupted filesystem recovery when tools fail
+  - **Use when:** Working with complex images, corrupted filesystems, or need manual parsing
+
+#### XFS Filesystem Forensics
 - **[Manual_XFS_File_Extraction_CheatSheet.md](Manual_XFS_File_Extraction_CheatSheet.md)** - Manual file extraction from XFS filesystems:
   - XFS allocation group (AG) structure and navigation
   - Inode B+tree traversal and chunk location
@@ -62,10 +86,10 @@ The **[alphas/](alphas/)** directory contains **untested and experimental** conf
   - High-fidelity, low-noise alert design
   - Schema version 4.82
 
-- **[filter_windows.yaml](alphas/filter_windows.yaml)** - Plaso timeline filter for Linux IR
-  - Note: Filename says "windows" but content is Linux-focused
+- **[filter_linux_ir.yaml](alphas/filter_linux_ir.yaml)** - Plaso timeline filter for Linux IR
   - Targets authentication logs, systemd journals, shell history, SSH config
   - Excludes high-volume, low-signal directories
+  - Template requires customization for specific cases
 
 - **[tools/self-check/](alphas/tools/self-check/)** - Minimal IR trust-check binary
   - Statically-linked x86-64 assembly binary (<16KB)
@@ -122,15 +146,32 @@ See the [detailed README](alphas/tools/self-check/README.md) for deployment tech
 
 ### Getting Started
 
-1. **Start with the /proc handbook** ([Overview_of_Proc.md](Overview_of_Proc.md)) for essential Linux forensic knowledge
-2. **Review advanced kernel-level threats** to understand sophisticated adversary techniques:
+#### For Quick Task-Based Navigation
+**Start here:** [QUICK_START.md](QUICK_START.md) - Find the right document based on what you're trying to accomplish (process analysis, file recovery, rootkit detection, etc.)
+
+#### For Learning the Repository Structure
+1. **Read [NAVIGATION.md](NAVIGATION.md)** to understand how documents relate to each other
+2. **Review the Quick Navigation** section above for task-specific guidance
+
+#### Recommended Reading Order for New Users
+1. **Start with the /proc reference** ([proc/PROC_REFERENCE_GUIDE.md](proc/PROC_REFERENCE_GUIDE.md)) for essential Linux forensic knowledge:
+   - Use quick reference tables during live IR
+   - Read detailed sections for specific artifacts
+   - Consult sys/ documents for kernel security parameter deep-dives
+
+2. **Learn filesystem recovery** progressively:
+   - Start with [EXT4_BasicFileRecovery.md](EXT4_BasicFileRecovery.md) for fundamentals
+   - Progress to [EXT4_DeletedFileCarving.md](EXT4_DeletedFileCarving.md) for deleted files
+   - Advance to [EXT4_AdvancedForensics.md](EXT4_AdvancedForensics.md) for complex scenarios
+   - Explore [Manual_XFS_File_Extraction_CheatSheet.md](Manual_XFS_File_Extraction_CheatSheet.md) for XFS systems
+
+3. **Understand advanced kernel-level threats**:
    - [eBPF_RootKits_Summary.md](eBPF_RootKits_Summary.md) - eBPF-based rootkits and detection challenges
    - [binfmt_misc-abuse-review.md](binfmt_misc-abuse-review.md) - Shadow SUID technique and kernel execution hijacking
-3. **Learn manual filesystem recovery** for low-level forensics:
-   - [Manual_EXT4_FileCarving.md](Manual_EXT4_FileCarving.md) - EXT4 filesystems (Ubuntu/Debian default)
-   - [Manual_XFS_File_Extraction_CheatSheet.md](Manual_XFS_File_Extraction_CheatSheet.md) - XFS filesystems (RHEL/CentOS default)
-4. **Build the self-check tool** ([alphas/tools/self-check/](alphas/tools/self-check/)) for IR deployments
-5. **Customize alpha configs** as needed for your environment (test thoroughly first)
+
+4. **Build practical IR tools**:
+   - [alphas/tools/self-check/](alphas/tools/self-check/) - Minimal IR trust-check binary
+   - Customize alpha configurations for your environment (test thoroughly first)
 
 ## Important Notes
 
