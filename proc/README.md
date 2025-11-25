@@ -1,125 +1,143 @@
-# Linux /proc Filesystem - Detailed Reference Documentation
+# Linux /proc Filesystem - Forensic Reference Documentation
 
-This directory contains expanded forensic reference materials for the Linux `/proc` pseudo-filesystem, broken down by functional category for easier navigation and deep-dive analysis.
+This directory contains the unified forensic reference guide for the Linux `/proc` pseudo-filesystem.
 
 ## Contents
 
-### [individual_proc_folders.md](individual_proc_folders.md)
-Comprehensive reference for **per-process directories** (`/proc/[pid]/`).
+### [PROC_REFERENCE_GUIDE.md](PROC_REFERENCE_GUIDE.md)
+**Complete unified /proc filesystem DFIR reference**
 
-Each running process on a Linux system has a corresponding directory at `/proc/[pid]/` containing detailed runtime information. This document provides:
-- Detailed descriptions of each file/directory within `/proc/[pid]/`
-- DFIR-focused guidance for each artifact
-- Indicators of compromise to look for
-- Common attack techniques visible in process directories
+This is the primary reference document for all `/proc` filesystem forensics. It provides both quick-reference tables and detailed analysis in a single, well-organized document.
 
-**Use this when:**
-- Investigating suspicious processes during live response
-- Analyzing process memory, file descriptors, or execution context
-- Looking for process masquerading, injection, or privilege escalation
-- Understanding container isolation or namespace manipulation
+**Structure:**
+- **Quick Reference Tables** - Rapid lookup for system-wide files, per-process artifacts, and kernel tunables
+- **Detailed System-Wide Files** - In-depth analysis of top-level `/proc` entries
+- **Detailed Per-Process Directories** - Comprehensive coverage of `/proc/[pid]/` artifacts
+- **Kernel Tunables Overview** - Quick reference for `/proc/sys/` with links to detailed analysis
+- **Practical DFIR Guidance** - Common attack patterns, baseline checks, and triage workflows
+- **Glossary** - Technical terms explained for clarity
 
-**Key artifacts covered:**
-- `cmdline`, `comm`, `exe` - Process identity and masquerading detection
-- `environ` - Environment variable hijacking (LD_PRELOAD, etc.)
-- `fd/`, `fdinfo/` - Open file descriptors and network sockets
-- `maps`, `smaps` - Memory layout and code injection detection
-- `ns/` - Namespace isolation (containers, rootkits)
-- `status` - UIDs, GIDs, capabilities (privilege analysis)
+**When to use this guide:**
+- During live incident response for quick artifact lookup
+- When investigating suspicious processes
+- For understanding kernel security parameters
+- As a comprehensive reference during forensic analysis
+- For training and learning Linux forensics
 
-### [proc_sys_contents.md](proc_sys_contents.md)
-Comprehensive reference for **kernel tunables** (`/proc/sys/`).
-
-The `/proc/sys/` tree holds kernel parameters configurable at runtime via sysctl. Changes here can significantly alter system security, stability, or behavior. This document provides:
-- Detailed coverage of security-relevant kernel parameters
-- Default vs. suspicious configuration values
-- Attack techniques that modify kernel tunables
-- Hardening recommendations and detection guidance
-
-**Use this when:**
-- Auditing system security configuration
-- Investigating privilege escalation or kernel exploitation
-- Analyzing persistence mechanisms (core_pattern, kernel module settings)
-- Understanding network security posture (ip_forward, TCP settings)
-- Detecting anti-forensics techniques (disabled core dumps, etc.)
-
-**Key areas covered:**
-- `/proc/sys/kernel/` - Core kernel behavior, ASLR, ptrace, modules
-- `/proc/sys/net/` - Network stack configuration and security
-- `/proc/sys/fs/` - Filesystem security (SUID, symlinks, quotas)
-- `/proc/sys/vm/` - Virtual memory management and swap
-- `/proc/sys/user/` - User namespace limits
+**Key Features:**
+- Combines breadth (all major `/proc` artifacts) with depth (detailed forensic guidance)
+- DFIR-focused: Every entry includes "DFIR Focus" guidance
+- Practical examples and command references throughout
+- Cross-references to detailed kernel tunable analysis in [../sys/](../sys/)
 
 ## How This Relates to Other Documentation
 
-These detailed references complement the main handbook:
+### For Detailed Kernel Tunable Analysis
+The `/proc/sys/` section in PROC_REFERENCE_GUIDE.md provides quick reference tables. For deep-dive security analysis of kernel tunables, see:
 
-**[../Overview_of_Proc.md](../Overview_of_Proc.md)**
-- Master reference handbook covering all three /proc areas
-- Includes system-wide /proc entries (top-level files like `/proc/modules`, `/proc/mounts`)
-- Best for quick reference and understanding the complete /proc landscape
-- Contains practical DFIR notes and recommended baseline checks
+- **[../sys/kernel_security_parameters.md](../sys/kernel_security_parameters.md)** - Complete forensic reference for `/proc/sys/kernel/`
+  - ASLR, module loading, core dumps, ptrace restrictions
+  - Attack scenarios and hardening guidance
+  - Detection strategies for privilege escalation
 
-**This directory (proc/)**
-- Expanded, detailed breakdowns for specific /proc categories
-- Better for deep-dive analysis and comprehensive artifact review
-- More extensive DFIR guidance for each individual entry
-- Ideal when investigating specific process or kernel configuration issues
+- **[../sys/network_security_parameters.md](../sys/network_security_parameters.md)** - Complete forensic reference for `/proc/sys/net/`
+  - IP forwarding, reverse path filtering, TCP hardening
+  - Network pivoting and lateral movement detection
+  - Attack scenarios and hardening guidance
+
+- **[../sys/README.md](../sys/README.md)** - Navigation guide for kernel tunable documentation
+
+### Repository Navigation
+- **[../QUICK_START.md](../QUICK_START.md)** - Find documents by task (process analysis, network forensics, rootkit detection)
+- **[../NAVIGATION.md](../NAVIGATION.md)** - Understand document relationships across the repository
 
 ## Recommended Reading Order
 
 ### For New Linux IR Practitioners
-1. Start with [../Overview_of_Proc.md](../Overview_of_Proc.md) to get the big picture
-2. Refer to these detailed documents when investigating specific artifacts
+1. **Start here:** [PROC_REFERENCE_GUIDE.md](PROC_REFERENCE_GUIDE.md) - Read the overview and skim the quick reference tables
+2. **During IR:** Use quick reference tables for rapid artifact lookup
+3. **For specific investigations:** Read detailed sections relevant to your case
+4. **For kernel security:** Consult [../sys/](../sys/) documents for detailed tunable analysis
 
 ### For Experienced Analysts
-Use these detailed references as quick lookups during live response:
-- Process acting suspicious? → [individual_proc_folders.md](individual_proc_folders.md)
-- System configuration issues? → [proc_sys_contents.md](proc_sys_contents.md)
+Use [PROC_REFERENCE_GUIDE.md](PROC_REFERENCE_GUIDE.md) as your primary reference:
+- **Quick triage:** Scan quick reference tables
+- **Process investigation:** Jump to "Per-Process Directories (Detailed)" section
+- **Security audit:** Review "Kernel Tunables Quick Reference" then consult [../sys/](../sys/) for details
+- **Attack pattern recognition:** Review "Practical DFIR Guidance" section
 
 ### For Threat Hunters
-Review both documents to:
-- Build detection rules targeting specific /proc artifacts
-- Understand baseline vs. anomalous configurations
-- Identify persistence and anti-forensics techniques
+1. Study [PROC_REFERENCE_GUIDE.md](PROC_REFERENCE_GUIDE.md) to understand baseline vs. anomalous /proc artifacts
+2. Review [../sys/kernel_security_parameters.md](../sys/kernel_security_parameters.md) for privilege escalation indicators
+3. Review [../sys/network_security_parameters.md](../sys/network_security_parameters.md) for lateral movement indicators
+4. Build detection rules targeting specific artifacts identified in the guides
 
 ## Using During Incident Response
 
-### Live Response Workflow
+### Live Response Workflow Example
+
 ```bash
 # Investigate suspicious process 1234
 cd /proc/1234
 
-# Check execution context
-ls -la exe           # References: individual_proc_folders.md - exe
-cat cmdline          # References: individual_proc_folders.md - cmdline
-cat environ          # References: individual_proc_folders.md - environ
+# Check execution context (Reference: PROC_REFERENCE_GUIDE.md - exe, cmdline, environ)
+ls -la exe           # Verify binary exists (deleted = suspicious)
+cat cmdline          # Check command arguments
+cat environ | tr '\0' '\n' | grep -E 'LD_|PATH'  # Look for LD_PRELOAD hijacking
 
-# Check open files and network
-ls -la fd/           # References: individual_proc_folders.md - fd
-cat net/tcp          # References: individual_proc_folders.md - net
+# Check open files and network (Reference: PROC_REFERENCE_GUIDE.md - fd/, net/)
+ls -la fd/           # Identify open files, sockets, deleted files
+ls -la fd/ | grep deleted
+cat net/tcp          # Network connections
 
-# Check memory layout
-cat maps             # References: individual_proc_folders.md - maps
-cat status           # References: individual_proc_folders.md - status
+# Check memory layout (Reference: PROC_REFERENCE_GUIDE.md - maps, status)
+cat maps | grep rwx  # Look for writable+executable regions (injection)
+cat status | grep -E '^(Name|Uid|Gid|Cap)'  # Check privileges and capabilities
 ```
 
-### Security Audit Workflow
+### Security Audit Workflow Example
+
 ```bash
-# Check kernel security settings
-cat /proc/sys/kernel/randomize_va_space    # References: proc_sys_contents.md
-cat /proc/sys/kernel/core_pattern          # References: proc_sys_contents.md
-cat /proc/sys/net/ipv4/ip_forward          # References: proc_sys_contents.md
+# Check critical kernel security settings
+# Reference: PROC_REFERENCE_GUIDE.md - Kernel Tunables section
+# Detailed analysis: ../sys/kernel_security_parameters.md
+
+cat /proc/sys/kernel/randomize_va_space    # Should be 2 (full ASLR)
+cat /proc/sys/kernel/modules_disabled      # Should be 1 (after boot)
+cat /proc/sys/kernel/core_pattern          # Check for suspicious pipe to script
+cat /proc/sys/net/ipv4/ip_forward          # Should be 0 (unless router)
+cat /proc/sys/kernel/yama/ptrace_scope     # Should be 1+ (restricted)
+
+# Full security baseline collection
+sysctl -a | grep -E 'kernel\.(randomize|kptr|dmesg|modules|yama)' > kernel_baseline.txt
+sysctl -a | grep -E 'net\.ipv4\.(ip_forward|conf.*rp_filter)' > network_baseline.txt
 ```
 
-## Notes
+## Important Notes
 
-- `/proc` is **volatile** - contents change continuously with system state
-- Always capture snapshots for repeatable analysis
-- On compromised systems, `/proc` may be partially falsified by rootkits
-- Cross-validate /proc data with memory dumps and disk forensics
-- Not all entries exist on every system (kernel version and config dependent)
+### Volatility
+- `/proc` is **live and volatile** - contents change continuously with system state
+- Always capture snapshots (`tar`, `rsync`, or specialized tools) for repeatable analysis
+- Document collection time for timeline correlation
+
+### Rootkit Considerations
+- Sophisticated rootkits can falsify `/proc` contents (LKM rootkits, eBPF-based)
+- Cross-validate with:
+  - Memory forensics (kernel memory dumps)
+  - Disk-based artifacts (logs, configs)
+  - Known-good forensic tools from trusted media
+
+### Kernel Version Dependencies
+- Available `/proc` files vary by kernel version
+- Modern features (namespaces, cgroups v2, time namespaces) require recent kernels
+- Always document kernel version: `uname -r`
+- Check kernel config if available: `cat /proc/config.gz | gunzip`
+
+## Archived Materials
+
+Previous versions of /proc documentation have been consolidated into PROC_REFERENCE_GUIDE.md. Archived documents are preserved in `../archived/` for reference but should not be used for current work.
 
 ## Part of FOR577 Additional Information
 
-These materials support **SANS FOR577: Linux Incident Response and Threat Hunting**. For more information about the course, visit [https://sans.org/for577](https://sans.org/for577)
+These materials support **SANS FOR577: Linux Incident Response and Threat Hunting**.
+For comprehensive Linux IR training, visit [https://sans.org/for577](https://sans.org/for577)
