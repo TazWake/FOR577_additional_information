@@ -54,41 +54,37 @@ The `/proc/sys/net/` tree controls all aspects of the Linux network stack behavi
 
 These detailed security references complement existing /proc documentation:
 
-**[../proc/proc_sys_contents.md](../proc/proc_sys_contents.md)**
-- Comprehensive reference covering ALL `/proc/sys/` categories
-- Includes vm/, fs/, user/, debug/, and dev/ subsystems
-- Best for complete system auditing or understanding the full landscape
-- More concise descriptions suitable for quick lookups
+**[../proc/PROC_REFERENCE_GUIDE.md](../proc/PROC_REFERENCE_GUIDE.md)**
+- Complete unified /proc filesystem forensic reference
+- Includes quick reference table for /proc/sys/ categories
+- Best starting point for understanding /proc filesystem forensics
+- Contains practical baseline checks and triage guidance
+- Links to this directory (sys/) for detailed kernel tunable analysis
 
 **This directory (sys/)**
 - Security-focused deep-dives into high-risk kernel tunables
 - Organized by attack surface (kernel security, network security)
-- More extensive DFIR guidance with attack scenarios
-- Detailed detection strategies and forensic indicators
+- Extensive DFIR guidance with attack scenarios and detection strategies
+- Detailed forensic indicators and hardening recommendations
 - Ideal for targeted threat hunting and incident investigation
-
-**[../Overview_of_Proc.md](../Overview_of_Proc.md)**
-- Master handbook with /proc/sys/ section included
-- Best starting point for understanding /proc filesystem forensics
-- Contains practical baseline checks and triage guidance
 
 ## Recommended Reading Order
 
 ### For New Linux IR Practitioners
-1. Start with [../Overview_of_Proc.md](../Overview_of_Proc.md) for foundational /proc knowledge
-2. Review [../proc/proc_sys_contents.md](../proc/proc_sys_contents.md) for complete /proc/sys/ coverage
-3. Use these security-focused documents during active investigations
+1. Start with [../proc/PROC_REFERENCE_GUIDE.md](../proc/PROC_REFERENCE_GUIDE.md) for foundational /proc knowledge
+2. Use the quick reference tables for rapid lookup during live IR
+3. Consult these security-focused documents for detailed kernel tunable analysis during active investigations
 
 ### For Security Auditors
 1. Begin with [kernel_security_parameters.md](kernel_security_parameters.md) for hardening assessment
 2. Follow with [network_security_parameters.md](network_security_parameters.md) for network security posture
-3. Cross-reference [../proc/proc_sys_contents.md](../proc/proc_sys_contents.md) for additional tunables
+3. Cross-reference [../proc/PROC_REFERENCE_GUIDE.md](../proc/PROC_REFERENCE_GUIDE.md) for additional /proc context
 
 ### For Threat Hunters and Incident Responders
 Use these documents as quick references during live response:
 - Suspected privilege escalation? → [kernel_security_parameters.md](kernel_security_parameters.md)
 - Network pivoting or lateral movement? → [network_security_parameters.md](network_security_parameters.md)
-- Comprehensive audit needed? → [../proc/proc_sys_contents.md](../proc/proc_sys_contents.md)
+- Need /proc artifact context? → [../proc/PROC_REFERENCE_GUIDE.md](../proc/PROC_REFERENCE_GUIDE.md)
 
 ## Using During Incident Response
 
@@ -190,7 +186,8 @@ These materials support **SANS FOR577: Linux Incident Response and Threat Huntin
 
 ## See Also
 
-- **[../proc/](../proc/)** - Per-process forensic artifacts and detailed /proc documentation
-- **[../Overview_of_Proc.md](../Overview_of_Proc.md)** - Complete /proc filesystem forensic handbook
+- **[../proc/PROC_REFERENCE_GUIDE.md](../proc/PROC_REFERENCE_GUIDE.md)** - Complete /proc filesystem forensic reference
 - **[../eBPF_RootKits_Summary.md](../eBPF_RootKits_Summary.md)** - Modern rootkit techniques
 - **[../binfmt_misc-abuse-review.md](../binfmt_misc-abuse-review.md)** - Kernel execution hijacking via binfmt_misc
+- **[../QUICK_START.md](../QUICK_START.md)** - Task-based navigation for quick reference
+- **[../NAVIGATION.md](../NAVIGATION.md)** - Document relationships and hierarchy
